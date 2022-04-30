@@ -3,7 +3,7 @@ import API, { IJob, IPageMeta, IPagination } from "../../API";
 
 import Config from "../../Config"
 
-import { Button, Skeleton, Collapse, Pagination, Tag, message } from "antd";
+import {Button, Skeleton, Collapse, Pagination, Tag, message, Result} from "antd";
 import Job from "./Job";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -22,6 +22,8 @@ const Units = (props: any) => {
     const [data, setData] = useState([] as IJob[]);
     const [scheduled, setScheduled] = useState([]);
     const [totalPages, setTotalPages] = useState();
+    const [isError, setError] = useState(false);
+    const [errorReason, setErrorReason] = useState("");
 
     const { page } = useParams<keyof IPageParams>() as IPageParams;
 
@@ -39,7 +41,14 @@ const Units = (props: any) => {
             setData(response.data.data);
             setTotalPages(response.data.meta.pagination.total_count);
 
-        });
+        }).catch((e) => {
+
+            setError(true);
+            setErrorReason(e.message);
+
+        }).finally(() => {
+            setLoading(false);
+        })
     }
 
     const loadScheduled = () => {
@@ -49,8 +58,13 @@ const Units = (props: any) => {
         api.fetchScheduled().then( response => {
             setLoading( false )
             setScheduled(response.data.data);
-        }).catch( err => {
-            message.error( err.message );
+        }).catch((e) => {
+
+            setError(true);
+            setErrorReason(e.message);
+
+        }).finally(() => {
+            setLoading(false);
         })
     }
 
@@ -138,6 +152,19 @@ const Units = (props: any) => {
 
     if (isLoading) {
         return <Skeleton active />
+    }
+
+    if (isError) {
+        return (
+            <Result
+                status="500"
+                title={errorReason}
+                extra={
+                    <Button onClick={() => {  window.location.reload() }
+                    } type="primary">Retry</Button>
+                }
+            />
+        )
     }
     else {
         return (

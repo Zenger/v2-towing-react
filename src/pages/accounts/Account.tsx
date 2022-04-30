@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 import {Descriptions, Button, Form, Input, message, Col, Row, Space} from 'antd';
 import API, { IAccount } from '../../API'
-import {MaskedInput} from "antd-mask-input";
+import Mask from "../../Mask";
 
 
 const { TextArea } = Input;
@@ -29,6 +29,9 @@ const Account = (props: any) => {
     })
 
     const handleChange = (e: any) => {
+        if (e.target.name === "phone") {
+            e.target.value = Mask( e.target.value, '###-###-####');
+        }
         setAccount(accountData => ({ ...accountData, [e.target.name]: e.target.value }));
     }
 
@@ -97,7 +100,7 @@ const Account = (props: any) => {
                         <Input name="name" value={account.name} placeholder="eg. Company Name LLC" onChange={handleChange} />
                     </Form.Item>
                     <Form.Item label="Phone">
-                        <MaskedInput name="phone" value={account.phone} placeholder="111-222-3456" onChange={handleChange} mask={'000-000-0000'} />
+                        <Input name="phone" value={account.phone} placeholder="111-222-3456" onChange={handleChange}  />
                     </Form.Item>
                     <Form.Item label="Address">
                         <Input name="address" value={account.address} placeholder="eg. 1111 Some St, CITY ST, 99999" onChange={handleChange} />

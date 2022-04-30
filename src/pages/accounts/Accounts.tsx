@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import API, { IAccount } from "../../API";
 
-import {Skeleton, Collapse, Pagination, Button, Drawer} from "antd";
+import {Skeleton, Collapse, Pagination, Button, Drawer, Result} from "antd";
 import Account from "./Account";
 import { useParams, useNavigate } from "react-router-dom";
 import {PlusOutlined} from "@ant-design/icons";
@@ -17,13 +17,16 @@ const { Panel } = Collapse;
 const Accounts = (props: any) => {
 
     const [isLoading, setLoading] = useState(false);
+    const [isError, setError] = useState(false);
+    const [errorReason, setErrorReason] = useState("");
 
     const [id, setId] = useState(0);
 
     const [data, setData] = useState([] as IAccount[]);
-    const [totalPages, setTotalPages] = useState();
+    const [totalPages, setTotalPages] = useState(0);
+    const [qs, setQs] = useState(0);
 
-    const { page } = useParams<keyof IPageParams>() as IPageParams;
+    const { page } = useParams();
 
     const [ isCreateVisible, setCreateVisible ] = useState(false);
 
@@ -32,16 +35,26 @@ const Accounts = (props: any) => {
 
     const loadAccounts = () => {
         setLoading(true);
+        const xs = page ? parseInt(page) : 0;
+        setQs(xs);
+
         let api = API.getInstance();
 
-        console.log(`mounted ${page}`);
+        console.log(`Accounts mounted ${page}`);
 
-        api.fetchAccounts(parseInt(page)).then(response => {
+        api.fetchAccounts(xs).then(response => {
             setLoading(false);
             setData(response.data.data);
             setTotalPages(response.data.meta.pagination.total_count);
 
-        });
+        }).catch((e) => {
+
+            setError(true);
+            setErrorReason(e.message);
+
+        }).finally(() => {
+            setLoading(false);
+        })
     }
 
 
@@ -56,7 +69,6 @@ const Accounts = (props: any) => {
 
 
     const changePage = (page: number) => {
-
         navigate("/accounts/" + page);
         loadAccounts();
     }
@@ -84,6 +96,19 @@ const Accounts = (props: any) => {
     if (isLoading) {
         return <Skeleton active />
     }
+
+    if (isError) {
+        return (
+            <Result
+                status="500"
+                title={errorReason}
+                extra={
+                    <Button onClick={() => {  window.location.reload() }
+                    } type="primary">Retry</Button>
+                }
+            />
+        )
+    }
     else {
         return (
             <div>
@@ -104,7 +129,7 @@ const Accounts = (props: any) => {
                 <br />
 
 
-                <Pagination defaultCurrent={parseInt(page)} defaultPageSize={25} total={totalPages} showSizeChanger={false} onChange={changePage} />
+                <Pagination defaultPageSize={25} current={qs} total={totalPages} showSizeChanger={false} onChange={changePage} />
 
                 <Drawer title="Add New" visible={isCreateVisible} width={720}  onClose={() => { setCreateVisible( !isCreateVisible )}} >
                     <Account new={true} onCreated={accountCreated} />

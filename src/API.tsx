@@ -188,7 +188,7 @@ export default class API {
 
 
     fetchAccounts(page: number = 1) {
-
+        page = isNaN(page) ? 1 : page;
         return axios.get(process.env.REACT_APP_API_BASE + "/accounts/?page=" + page, this.getHeaderConfigDefault());
     }
 
@@ -206,7 +206,9 @@ export default class API {
 
 
     fetchUnits( page : number = 1) {
-        return axios.get(process.env.REACT_APP_API_BASE + "/units/?page=" + page, this.getHeaderConfigDefault() );
+        let qs = isNaN(page) ? "" : "?page=" + page;
+
+        return axios.get(process.env.REACT_APP_API_BASE + `/units/${qs}` , this.getHeaderConfigDefault() );
     }
 
     fetchUnit(id: number) {
@@ -244,6 +246,7 @@ export default class API {
     }
 
     fetchFleetUnits(  page : number = 1 ) {
+         page = isNaN(page) ? 1 : page;
          return axios.get(process.env.REACT_APP_API_BASE + "/fleet_units/?page=" + page, this.getHeaderConfigDefault() );
     }
 

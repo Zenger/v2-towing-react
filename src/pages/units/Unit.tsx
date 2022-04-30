@@ -5,7 +5,9 @@ import {Descriptions, Button, Form, Input, message, Select, Col, Space, Row} fro
 import API, { IUnit } from '../../API'
 
 import { UnitType } from '../../Types';
-import {MaskedInput} from "antd-mask-input";
+
+
+import Mask from "../../Mask";
 
 const { TextArea } = Input;
 
@@ -33,6 +35,13 @@ const Unit = (props: any) => {
     })
 
     const handleChange = (e: any) => {
+        if (e.target.name === "license") {
+            e.target.value = Mask( e.target.value, 'XX-XXXXXXXXX');
+        } else if (e.target.name === "vin") {
+            e.target.value = Mask( e.target.value, '#############');
+        } else if (e.target.name === "year") {
+            e.target.value = Mask( e.target.value , "####");
+        }
         setUnit(unitData => ({ ...unitData, [e.target.name]: e.target.value }));
     }
 
@@ -115,7 +124,7 @@ const Unit = (props: any) => {
             <div>
                 <Form layout="horizontal" labelCol={{ span: 4 }} wrapperCol={{ span: 16 }} initialValues={{ remember: true }}>
                     <Form.Item label="Year">
-                        <MaskedInput name="year" value={unit.year} placeholder="eg. 2019" onChange={handleChange} mask={'0000'} />
+                        <Input type="number" name="year" value={unit.year} placeholder="eg. 2019" onChange={handleChange} />
                     </Form.Item>
                     <Form.Item label="Make">
                         <Input name="make" value={unit.make} placeholder="eg. Acura" onChange={handleChange} />
@@ -124,7 +133,7 @@ const Unit = (props: any) => {
                         <Input name="model" value={unit.model} placeholder="eg. Integra" onChange={handleChange} />
                     </Form.Item>
                     <Form.Item label="License">
-                        <MaskedInput name="license" value={unit.license} placeholder="2 digit state - plate number" onChange={handleChange} mask={'**-000000000000000000000000'} />
+                        <Input name="license" value={unit.license} placeholder="2 digit state - plate number" onChange={handleChange} />
                     </Form.Item>
                     <Form.Item label="VIN">
                         <Input name="vin" value={unit.vin} placeholder="13 digit vehicle identification number" onChange={handleChange} />

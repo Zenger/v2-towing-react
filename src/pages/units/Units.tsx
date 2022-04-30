@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import API, {IUnit, IPageMeta, IPagination, IAccount} from "../../API";
 
-import {Button, Skeleton, Collapse, Pagination, Drawer} from "antd";
+import {Button, Skeleton, Collapse, Pagination, Drawer, Result} from "antd";
 import Unit from "./Unit";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -19,6 +19,8 @@ const Units = (props: any) => {
 
     const [isLoading, setLoading] = useState(false);
     const [id, setId] = useState(0);
+    const [isError, setError] = useState(false);
+    const [errorReason, setErrorReason] = useState("");
 
     const [data, setData] = useState([] as IUnit[]);
     const [totalPages, setTotalPages] = useState();
@@ -40,7 +42,14 @@ const Units = (props: any) => {
             setData(response.data.data);
             setTotalPages(response.data.meta.pagination.total_count);
 
-        });
+        }).catch((e) => {
+
+            setError(true);
+            setErrorReason(e.message);
+
+        }).finally(() => {
+            setLoading(false);
+        })
     }
 
 
@@ -81,6 +90,19 @@ const Units = (props: any) => {
 
     if (isLoading) {
         return <Skeleton active />
+    }
+
+    if (isError) {
+        return (
+            <Result
+                status="500"
+                title={errorReason}
+                extra={
+                    <Button onClick={() => {  window.location.reload() }
+                    } type="primary">Retry</Button>
+                }
+            />
+        )
     }
     else {
         return (
