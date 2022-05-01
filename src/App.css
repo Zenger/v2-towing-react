@@ -1,0 +1,37 @@
+.App {
+    padding: 15px;
+}
+
+.main-jobs-table {
+    width: 100%;
+    margin: 0 auto;
+    clear: both;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+
+.main-jobs-table th, .main-jobs-table td {
+    border:1px solid #f4f4f4;
+    line-height: 1.6;
+    vertical-align: top;
+    box-sizing: content-box;
+    padding: 4px 10px !important;
+}
+
+.status-completed {
+    background-color: #f2dede !important;
+}
+
+.status-scheduled {
+    background-color: #d9edf7 !important;;
+}
+
+.status-cancelled {
+    background-color: #fcf8e3 !important;;
+}
+
+.status-open {
+    background-color: #dff0d8 !important;;
+}
+
