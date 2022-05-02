@@ -15,7 +15,7 @@ type IPageParams = {
 const { Panel } = Collapse;
 
 
-const Units = (props: any) => {
+const Jobs = (props: any) => {
 
     const [isLoading, setLoading] = useState(false);
 
@@ -204,4 +204,4 @@ const Units = (props: any) => {
 }
 
 
-export default Units;
+export default Jobs;

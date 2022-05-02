@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import API, { IAccount } from "../../API";
 
-import {Skeleton, Collapse, Pagination, Button, Drawer, Result} from "antd";
+import {Skeleton, Collapse, Button, Drawer, Result} from "antd";
 import Account from "./Account";
 import { useParams, useNavigate } from "react-router-dom";
 import {PlusOutlined} from "@ant-design/icons";
+import Pagination from "react-js-pagination";
 
 
 type IPageParams = {
@@ -19,31 +20,29 @@ const Accounts = (props: any) => {
     const [isLoading, setLoading] = useState(false);
     const [isError, setError] = useState(false);
     const [errorReason, setErrorReason] = useState("");
-
+    const [currentPage, setCurrentPage ] = useState(0 );
     const [id, setId] = useState(0);
 
     const [data, setData] = useState([] as IAccount[]);
     const [totalPages, setTotalPages] = useState(0);
-    const [qs, setQs] = useState(0);
 
-    const { page } = useParams();
+
 
     const [ isCreateVisible, setCreateVisible ] = useState(false);
-
 
     let navigate = useNavigate();
 
     const loadAccounts = () => {
-        setLoading(true);
-        const xs = page ? parseInt(page) : 0;
-        setQs(xs);
+
+        let params = new URLSearchParams(window.location.search);
+        let page : number = Number(params.get('page'));
+        setCurrentPage(page);
+
 
         let api = API.getInstance();
 
-        console.log(`Accounts mounted ${page}`);
-
-        api.fetchAccounts(xs).then(response => {
-            setLoading(false);
+        api.fetchAccounts(page).then(response => {
+            setLoading(true);
             setData(response.data.data);
             setTotalPages(response.data.meta.pagination.total_count);
 
@@ -61,7 +60,6 @@ const Accounts = (props: any) => {
     useEffect(() => {
 
         loadAccounts()
-
         return () => {
             console.log('Component will be unmount');
         }
@@ -69,7 +67,8 @@ const Accounts = (props: any) => {
 
 
     const changePage = (page: number) => {
-        navigate("/accounts/" + page);
+
+        navigate("/accounts/?page=" + page);
         loadAccounts();
     }
 
@@ -128,8 +127,15 @@ const Accounts = (props: any) => {
 
                 <br />
 
+                <Pagination
+                      activePage={currentPage}
+                      itemsCountPerPage={25}
+                      totalItemsCount={totalPages}
+                      pageRangeDisplayed={5}
+                      onChange={changePage}
+                    />
 
-                <Pagination defaultPageSize={25} current={qs} total={totalPages} showSizeChanger={false} onChange={changePage} />
+
 
                 <Drawer title="Add New" visible={isCreateVisible} width={720}  onClose={() => { setCreateVisible( !isCreateVisible )}} >
                     <Account new={true} onCreated={accountCreated} />

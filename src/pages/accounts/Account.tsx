@@ -43,7 +43,7 @@ const Account = (props: any) => {
         let api = API.getInstance();
         setLoading(true);
 
-        if (props.new == true) {
+        if (props.new === true) {
             api.createAccount(account as IAccount).then( (response) => {
                 message.success("Account Saved");
 
