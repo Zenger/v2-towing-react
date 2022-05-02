@@ -14,6 +14,8 @@ const FleetUnit = (props: any) => {
 
 
     const [isEdit, setEdit] = useState(false);
+    const [isLoading, setLoading] = useState(false);
+
     const [fleetunit, setFleetUnit] = useState({
         id: props.id,
         unit_type: props.unit_type,
@@ -25,6 +27,8 @@ const FleetUnit = (props: any) => {
         odo: props.odo,
         registration: props.registration,
         meta: props.meta,
+        new: props.new,
+        onAccountCreated: props.onAccountCreated
     })
 
 

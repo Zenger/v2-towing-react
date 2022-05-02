@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import API, { IUnit, IPageMeta, IPagination } from "../../API";
+import API, {IUnit, IPageMeta, IPagination, IAccount} from "../../API";
 
-import { Button, Skeleton, Collapse, Pagination } from "antd";
+import {Button, Skeleton, Collapse, Pagination, Drawer, Result} from "antd";
 import Unit from "./Unit";
 import { useParams, useNavigate } from "react-router-dom";
+
+import {PlusOutlined} from "@ant-design/icons";
 
 
 type IPageParams = {
@@ -17,11 +19,14 @@ const Units = (props: any) => {
 
     const [isLoading, setLoading] = useState(false);
     const [id, setId] = useState(0);
+    const [isError, setError] = useState(false);
+    const [errorReason, setErrorReason] = useState("");
 
     const [data, setData] = useState([] as IUnit[]);
     const [totalPages, setTotalPages] = useState();
 
     const { page } = useParams<keyof IPageParams>() as IPageParams;
+    const [ isCreateVisible, setCreateVisible ] = useState(false);
 
 
     let navigate = useNavigate();
@@ -37,7 +42,14 @@ const Units = (props: any) => {
             setData(response.data.data);
             setTotalPages(response.data.meta.pagination.total_count);
 
-        });
+        }).catch((e) => {
+
+            setError(true);
+            setErrorReason(e.message);
+
+        }).finally(() => {
+            setLoading(false);
+        })
     }
 
 
@@ -64,13 +76,38 @@ const Units = (props: any) => {
         )
     }
 
+    const create = () => {
+        setCreateVisible(true);
+    }
+
+    const unitCreated = (unit: IUnit) => {
+        let d = data;
+        d.slice().unshift(unit); // add to the top of the list
+        setData(d);
+        console.log(`set data ${unit}`);
+        setCreateVisible(false);
+    }
 
     if (isLoading) {
         return <Skeleton active />
     }
+
+    if (isError) {
+        return (
+            <Result
+                status="500"
+                title={errorReason}
+                extra={
+                    <Button onClick={() => {  window.location.reload() }
+                    } type="primary">Retry</Button>
+                }
+            />
+        )
+    }
     else {
         return (
             <div>
+                <Button onClick={create} type="primary" style={{"float": "right"}}><PlusOutlined /> Add New </Button> <br/> <br/>
                 <Collapse collapsible="header">
                     {
                         data.map(unit => {
@@ -88,6 +125,9 @@ const Units = (props: any) => {
 
 
                 <Pagination defaultCurrent={parseInt(page)} defaultPageSize={25} total={totalPages} showSizeChanger={false} onChange={changePage} />
+                <Drawer title="Add New" visible={isCreateVisible} width={720}  onClose={() => { setCreateVisible( !isCreateVisible )}} >
+                    <Unit new={true} onCreated={unitCreated} />
+                </Drawer>
             </div>
         )
     }

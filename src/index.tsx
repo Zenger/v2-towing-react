@@ -71,7 +71,7 @@ ReactDOM.render(
             <Routes>
               <Route path="/" element={<App />} />
               <Route path="/accounts/" element={<Accounts />}>
-                 <Route path=":page" element={<Accounts />} />
+
               </Route>
               
               <Route path="/units" element={<Units />}>
@@ -93,7 +93,7 @@ ReactDOM.render(
             </Routes>
           </Content>
           <Footer style={{ textAlign: 'center' }}>
-            Ant Design ©2016 Created by Ant UED
+            Towing Track
           </Footer>
         </Layout>
 
