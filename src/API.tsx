@@ -88,6 +88,8 @@ export interface IJob {
   attachments? : any[],
   created_at: string;
   updated_at: string;
+  new?: boolean;
+  onCreated?: boolean;
 }
 
 export interface IPageMeta {
@@ -235,6 +237,10 @@ export default class API {
 
     fetchJob( id? : any ) {
         return axios.get( process.env.REACT_APP_API_BASE + "/tows/" + id , this.getHeaderConfigDefault() );
+    }
+
+    createJob( job:IJob ){
+        return axios.post( process.env.REACT_APP_API_BASE + "/tows/" , this.getHeaderConfigDefault());
     }
 
     updateJob( job : IJob) {

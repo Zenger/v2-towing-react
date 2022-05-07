@@ -31,18 +31,23 @@ const Unit = (props: any) => {
         color: props.color,
         meta: props.meta,
         new: props.new,
-        onCreated: props.onCreated
+        onCreated: props.onCreated,
+        onChanged: props.onChanged,
+        hideSaveButton: props.hideSaveButton
     })
 
     const handleChange = (e: any) => {
         if (e.target.name === "license") {
             e.target.value = Mask( e.target.value, 'XX-XXXXXXXXX');
         } else if (e.target.name === "vin") {
-            e.target.value = Mask( e.target.value, '#############');
+            e.target.value = Mask( e.target.value, '#################');
         } else if (e.target.name === "year") {
             e.target.value = Mask( e.target.value , "####");
         }
         setUnit(unitData => ({ ...unitData, [e.target.name]: e.target.value }));
+        if (props.onChanged) {
+            props.onChanged( unit );
+        }
     }
 
     const handleSelect = (value :any) => {
@@ -59,7 +64,7 @@ const Unit = (props: any) => {
 
         if ( props.new === true) {
            api.createUnit( unit as IUnit).then( (response) => {
-                props.onCreated( response );
+                props.onCreated( response.data );
                 message.success("Unit was created!");
            }).catch( (e:any) => {
                message.error(e.message);
@@ -79,14 +84,6 @@ const Unit = (props: any) => {
 
     }
 
-    const plateMask = React.useMemo(
-        () => [
-            {
-                mask: /^#[0-9a-f]{0,6}$/i,
-                lazy: false
-            }
-        ], []
-    );
 
     const renderDisplayMode = () => {
         return (
@@ -114,7 +111,7 @@ const Unit = (props: any) => {
         }
 
 
-    }, [props] );
+    }, [] );
 
 
     const renderEditMode = () => {
@@ -133,10 +130,10 @@ const Unit = (props: any) => {
                         <Input name="model" value={unit.model} placeholder="eg. Integra" onChange={handleChange} />
                     </Form.Item>
                     <Form.Item label="License">
-                        <Input name="license" value={unit.license} placeholder="2 digit state - plate number" onChange={handleChange} />
+                        <Input name="license" value={unit.license} placeholder="STATE CODE - plate number" onChange={handleChange} />
                     </Form.Item>
                     <Form.Item label="VIN">
-                        <Input name="vin" value={unit.vin} placeholder="13 digit vehicle identification number" onChange={handleChange} />
+                        <Input name="vin" value={unit.vin} placeholder="17 digit vehicle identification number" onChange={handleChange} />
                     </Form.Item>
                     <Form.Item label="Color">
                         <Input name="color" value={unit.color} placeholder="eg. Red" onChange={handleChange} />
@@ -158,7 +155,7 @@ const Unit = (props: any) => {
                     <Col xs={6} push={4}>
                         <Space>
                             { props.new ? "" : <Button danger onClick={setEditState}>Cancel</Button> }
-                            <Button type="primary" loading={isLoading} onClick={saveUnit}>Save</Button>
+                            { props.hideSaveButton ? "" : <Button type="primary" loading={isLoading} onClick={saveUnit}>Save</Button> }
                         </Space>
                     </Col>
                 </Row>

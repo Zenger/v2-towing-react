@@ -17,6 +17,7 @@ import JobView from "./pages/jobs/JobView";
 import FleetUnits from "./pages/fleetunits/FleetUnits";
 import Options from "./pages/options/Options";
 import Users from "./pages/users/Users";
+import JobCreate from "./pages/jobs/JobCreate";
 
 
 const { Content, Footer } = Layout;
@@ -70,19 +71,11 @@ ReactDOM.render(
            
             <Routes>
               <Route path="/" element={<App />} />
-              <Route path="/accounts/" element={<Accounts />}>
-
-              </Route>
-              
-              <Route path="/units" element={<Units />}>
-                <Route path=":page" element={<Units />} />
-              </Route>
-
-              <Route path="/jobs" element={<Jobs />}>
-                <Route path=":page" element={<Jobs />} />
-              </Route>
-
-              <Route path="/job/:id" element={<JobView />} />
+              <Route path="/accounts/" element={<Accounts />} />
+              <Route path="/units" element={<Units />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="jobs/create" element={<JobCreate />} />
+              <Route path="/jobs/:id" element={<JobView />} />
 
              <Route path="/fleet/" element={<FleetUnits />}>
                  <Route path=":page" element={<FleetUnits />} />

@@ -8,12 +8,7 @@ import Mask from "../../Mask";
 
 const { TextArea } = Input;
 
-
-
-
-
 const Account = (props: any) => {
-
 
     const [isEdit, setEdit] = useState(false);
     const [isLoading, setLoading] = useState(false);
@@ -25,7 +20,9 @@ const Account = (props: any) => {
         address: props.address,
         notes: props.notes,
         new: props.new,
-        onCreated: props.onCreated
+        onCreated: props.onCreated,
+        onChanged: props.onChanged,
+        hideSaveButton: props.hideSaveButton,
     })
 
     const handleChange = (e: any) => {
@@ -33,6 +30,9 @@ const Account = (props: any) => {
             e.target.value = Mask( e.target.value, '###-###-####');
         }
         setAccount(accountData => ({ ...accountData, [e.target.name]: e.target.value }));
+        if (props.onChanged) {
+            props.onChanged( account );
+        }
     }
 
     const setEditState = (e: any) => {
@@ -45,9 +45,9 @@ const Account = (props: any) => {
 
         if (props.new === true) {
             api.createAccount(account as IAccount).then( (response) => {
-                message.success("Account Saved");
+                message.success("Account Created");
 
-                account.onCreated( response );
+                account.onCreated( response.data );
 
             }).catch( (e) => {
                 message.error(e);
@@ -87,7 +87,7 @@ const Account = (props: any) => {
         return () => {
             console.log('Component will be unmount');
         }
-    }, [props]);
+    }, []);
 
 
     const renderEditMode = () => {
@@ -113,7 +113,7 @@ const Account = (props: any) => {
                     <Col xs={6} push={4}>
                        <Space>
                            { props.new ? "" : <Button danger onClick={setEditState}>Cancel</Button> }
-                           <Button type="primary" loading={isLoading} onClick={saveAccount}>Save</Button>
+                           { props.hideSaveButton ? "" : <Button type="primary" loading={isLoading} onClick={saveAccount}>Save</Button> }
                        </Space>
                     </Col>
                 </Row>

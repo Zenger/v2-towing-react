@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import API, {IUnit, IPageMeta, IPagination, IAccount} from "../../API";
 
-import {Button, Skeleton, Collapse, Pagination, Drawer, Result} from "antd";
+import {Button, Skeleton, Collapse, Drawer, Result} from "antd";
 import Unit from "./Unit";
 import { useParams, useNavigate } from "react-router-dom";
+import Pagination from "react-js-pagination";
 
 import {PlusOutlined} from "@ant-design/icons";
 
@@ -21,23 +22,27 @@ const Units = (props: any) => {
     const [id, setId] = useState(0);
     const [isError, setError] = useState(false);
     const [errorReason, setErrorReason] = useState("");
+    const [currentPage, setCurrentPage ] = useState(0 );
+
 
     const [data, setData] = useState([] as IUnit[]);
     const [totalPages, setTotalPages] = useState();
 
-    const { page } = useParams<keyof IPageParams>() as IPageParams;
     const [ isCreateVisible, setCreateVisible ] = useState(false);
 
 
     let navigate = useNavigate();
 
     const loadUnits = () => {
+        let params = new URLSearchParams(window.location.search);
+        let page : number = Number(params.get('page'));
+        if (page === 0 ) page = 1;
+        setCurrentPage(page);
+
         setLoading(true);
         let api = API.getInstance();
 
-        console.log(`mounted ${page}`);
-
-        api.fetchUnits(parseInt(page)).then(response => {
+        api.fetchUnits(page).then(response => {
             setLoading(false);
             setData(response.data.data);
             setTotalPages(response.data.meta.pagination.total_count);
@@ -65,7 +70,7 @@ const Units = (props: any) => {
 
     const changePage = (page: Number) => {
 
-        navigate("/units/" + page);
+        navigate("/units/?page=" + page);
         loadUnits();
     }
 
@@ -124,7 +129,13 @@ const Units = (props: any) => {
                 <br />
 
 
-                <Pagination defaultCurrent={parseInt(page)} defaultPageSize={25} total={totalPages} showSizeChanger={false} onChange={changePage} />
+                <Pagination
+                    activePage={currentPage}
+                    itemsCountPerPage={25}
+                    totalItemsCount={totalPages}
+                    pageRangeDisplayed={5}
+                    onChange={changePage}
+                />
                 <Drawer title="Add New" visible={isCreateVisible} width={720}  onClose={() => { setCreateVisible( !isCreateVisible )}} >
                     <Unit new={true} onCreated={unitCreated} />
                 </Drawer>

@@ -7,7 +7,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {PlusOutlined} from "@ant-design/icons";
 import Pagination from "react-js-pagination";
 
-
 type IPageParams = {
     page: string,
 }
@@ -36,6 +35,7 @@ const Accounts = (props: any) => {
 
         let params = new URLSearchParams(window.location.search);
         let page : number = Number(params.get('page'));
+        if (page === 0 ) page = 1;
         setCurrentPage(page);
 
 

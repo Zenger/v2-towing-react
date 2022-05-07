@@ -37,7 +37,9 @@ const Job = (props: any) => {
           schedule_date: props.schedule_date,
           payment_id: props.payment_id,
           created_at: props.created_at,
-          updated_at: props.updated_at
+          updated_at: props.updated_at,
+          new: props.new,
+          onCreated: props.onCreated,
     })
 
     const handleChange = (e: any) => {
@@ -65,13 +67,25 @@ const Job = (props: any) => {
 
     const saveJob = () => {
         let api = API.getInstance();
+        if (props.new === true) {
+            api.createJob(job as IJob).then((response) => {
+                message.success("Job created!");
+                props.onCreated( response.data );
+            }).catch(e => {
+                message.error(e.message, 1.5);
+            }).finally(() =>{
 
-        console.log( "SAVING JOB...\n", job );
-        api.updateJob(job as IJob).then((response) => {
-            console.log('yeet');
-        }).catch(e => {
-            message.error(e.message, 1.5);
-        });
+            })
+        } else {
+            api.createJob(job as IJob).then((response) => {
+                message.success("Job Saved!");
+            }).catch(e => {
+                message.error(e.message, 1.5);
+            }).finally(() =>{
+
+            })
+        }
+
 
     }
 
@@ -115,11 +129,9 @@ const Job = (props: any) => {
 
 
     const renderEditMode = () => {
-
-
         return (
               <div>
-                <Form layout="horizontal" labelCol={{ span: 2 }} wrapperCol={{ span: 16 }} initialValues={{ remember: true }}>
+                <Form layout="horizontal" labelCol={{ span: 3 }} wrapperCol={{ span: 16 }} initialValues={{ remember: true }}>
                     <Form.Item label="Address From">
                         <Input name="from" value={job.from} placeholder="Pickup address" onChange={handleChange} />
                     </Form.Item>
@@ -159,16 +171,16 @@ const Job = (props: any) => {
                     </Form.Item>
 
                     <Form.Item label="Reference From">
-                        <Input name="meta.referece_number" value={job.meta?.reference_from || ""} placeholder="Reference if applicable" onChange={e=>handleMetaChange("reference_from", e.target.value)} />
+                        <Input name="meta.reference_from" value={job.meta?.reference_from || ""} placeholder="Reference if applicable" onChange={e=>handleMetaChange("reference_from", e.target.value)} />
                     </Form.Item>
                      <Form.Item label="Reference Number">
-                        <Input name="meta.referece_number" value={job.meta?.reference_number || ""} placeholder="Reference number if applicable" onChange={e=>handleMetaChange("reference_number", e.target.value)} />
+                        <Input name="meta.reference_number" value={job.meta?.reference_number || ""} placeholder="Reference number if applicable" onChange={e=>handleMetaChange("reference_number", e.target.value)} />
                     </Form.Item>
 
 
 
                 </Form>
-                <Button danger onClick={setEditState}>Cancel</Button> <Button type="primary" onClick={saveJob}>Save</Button>
+                  { props.new ? "" : <Button danger onClick={setEditState}>Cancel</Button> }<Button type="primary" onClick={saveJob}>Save</Button>
             </div>
         )
     }
@@ -176,7 +188,7 @@ const Job = (props: any) => {
 
     return (
         <div className="account">
-            {isEdit ? renderEditMode() : renderDisplayMode()} <br />
+            {isEdit || props.new ? renderEditMode() : renderDisplayMode()} <br />
         </div>
     )
 

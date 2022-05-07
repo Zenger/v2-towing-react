@@ -24,8 +24,9 @@ const PaymentDetails = (props:any) => {
     const [total, setTotal ] = useState(0);
 
 
-   const {id} = props;
+    const {id } = props;
 
+    const isNew = props.new;
 
     const isEmpty = (obj:Object) => {
         return Object.keys(obj).length === 0;
@@ -36,7 +37,7 @@ const PaymentDetails = (props:any) => {
         setLoading( true );
         let api = API.getInstance();
         if ( id ) {
-             api.fetchPaymentInfo( id ).then( response => {
+            api.fetchPaymentInfo( id ).then( response => {
 
                 let r = response.data;
                 r.charges = JSON.parse(r.charges);
@@ -62,7 +63,7 @@ const PaymentDetails = (props:any) => {
 
         if (id !== undefined) loadPaymentInfo()
 
-        caclulateTotal();
+        calculateTotal();
 
     }, [payment.id]);
 
@@ -89,7 +90,7 @@ const PaymentDetails = (props:any) => {
         api.updatePaymentInfo( pp.id, pp ).then( response => {
             console.log(response );
         }).finally( () => {
-           setLoading(false);
+            setLoading(false);
         });
     }
 
@@ -118,8 +119,8 @@ const PaymentDetails = (props:any) => {
 
 
     const setPriceGroup = (target:any) => {
-       const selectedPaymentGroup = priceGroup[ target ];
-       setPaymentCharges( selectedPaymentGroup.charges );
+        const selectedPaymentGroup = priceGroup[ target ];
+        setPaymentCharges( selectedPaymentGroup.charges );
     }
 
 
@@ -128,7 +129,7 @@ const PaymentDetails = (props:any) => {
         let charges = paymentCharges;
         let valueToRemove = [charges[index]];
         setPaymentCharges( charges.filter( e => !valueToRemove.includes(e)) );
-        caclulateTotal();
+        calculateTotal();
     }
 
     const addCharge = () => {
@@ -137,7 +138,7 @@ const PaymentDetails = (props:any) => {
         currentCharges.push( charge );
         paymentCharges.slice(0);
         setPaymentCharges( currentCharges.slice(0)); // @TODO: WTH? Why this slicing the array trigger a rerender?
-        caclulateTotal();
+        calculateTotal();
     }
 
 
@@ -145,10 +146,10 @@ const PaymentDetails = (props:any) => {
         let pc = paymentCharges;
         pc[i].amount = amount;
         setPaymentCharges( pc.slice(0) );
-        caclulateTotal();
+        calculateTotal();
     }
 
-    const caclulateTotal = () => {
+    const calculateTotal = () => {
         let _total: number = 0;
         for (let i = 0; i< paymentCharges.length; i++) {
             _total = +_total + +paymentCharges[i].amount;
@@ -163,105 +164,105 @@ const PaymentDetails = (props:any) => {
     }
 
 
-      const renderEditMode = () => {
+    const renderEditMode = () => {
         return (
             <div>
-                 <Form layout="horizontal" labelCol={{ span:8 }} wrapperCol={{ span: 10 }} initialValues={{ remember: true }}>
+                <Form layout="horizontal" labelCol={{ span:8 }} wrapperCol={{ span: 10 }} initialValues={{ remember: true }}>
                     <Form.Item label="Paid">
-                         <Select defaultValue={payment.paid?.toString()}  onChange={value => handlePaymentChange("paid", value)}>
-                             <Option value="false">No</Option>
-                             <Option value="true">Yes</Option>
+                        <Select defaultValue={payment.paid?.toString()}  onChange={value => handlePaymentChange("paid", value)}>
+                            <Option value="false">No</Option>
+                            <Option value="true">Yes</Option>
                         </Select>
                     </Form.Item>
-                     <Form.Item label="Paid By">
-                         <Select defaultValue={payment.payment_type}>
-                             {
-                                 PaymentMethod.map( (el, index) => {
-                                     return <Option key={index} value={index}>{el}</Option>
-                                 })
-                             }
-                         </Select>
-                     </Form.Item>
-                      <Form.Item label="Payment Date">
+                    <Form.Item label="Paid By">
+                        <Select defaultValue={payment.payment_type}>
+                            {
+                                PaymentMethod.map( (el, index) => {
+                                    return <Option key={index} value={index}>{el}</Option>
+                                })
+                            }
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Payment Date">
                         <DatePicker defaultValue={moment(payment.payment_date) || ""} onChange={ (o, date)=> handlePaymentChange("payment_date", date)} />
                     </Form.Item>
 
 
-                     <Form.Item label="Paid By">
-                         <Input name="paid_by" defaultValue={payment.paid_by} value={payment.paid_by} placeholder="Paid by person or org." onChange={e=>handlePaymentChange("paid_by", e.target.value)} />
+                    <Form.Item label="Paid By">
+                        <Input name="paid_by" defaultValue={payment.paid_by} value={payment.paid_by} placeholder="Paid by person or org." onChange={e=>handlePaymentChange("paid_by", e.target.value)} />
                     </Form.Item>
 
-                     <Divider />
+                    <Divider />
 
-                     <Form.Item label="Pricing Group">
-                         <Popconfirm title="This will reset current charges. Are you sure?">
-                             <Select onChange={setPriceGroup}>
-                             {
-                                 priceGroup.map( (el, index) => {
-                                    return <Option key={el.name + index} value={index}>{el.name}</Option>
-                                 })
-                             }
+                    <Form.Item label="Pricing Group">
+                        <Popconfirm title="This will reset current charges. Are you sure?">
+                            <Select onChange={setPriceGroup}>
+                                {
+                                    priceGroup.map( (el, index) => {
+                                        return <Option key={el.name + index} value={index}>{el.name}</Option>
+                                    })
+                                }
 
-                         </Select>
-                         </Popconfirm>
-                     </Form.Item>
+                            </Select>
+                        </Popconfirm>
+                    </Form.Item>
 
-                     {
-                         paymentCharges.map( (el, i) => {
+                    {
+                        paymentCharges.map( (el, i) => {
 
-                             return ( <ChargeEntry key={i} index={i} charge={el} onDelete={removeCharge} onEntryChanged={chargeChanged} /> )
-                         })
-                     }
+                            return ( <ChargeEntry key={i} index={i} charge={el} onDelete={removeCharge} onEntryChanged={chargeChanged} /> )
+                        })
+                    }
 
-                 </Form>
+                </Form>
                 <br />
-               <Button onClick={addCharge}><PlusOutlined /></Button> <Button danger onClick={setEditState}>Cancel</Button> <Button type="primary" onClick={savePaymentDetails}>Save</Button> <span style={{float: "right", fontSize:"16px"}}>Transaction Total: ${total} </span>
+                <Button onClick={addCharge}><PlusOutlined /></Button> <Button danger onClick={setEditState}>Cancel</Button> <Button type="primary" onClick={savePaymentDetails}>Save</Button> <span style={{float: "right", fontSize:"16px"}}>Transaction Total: ${total} </span>
             </div>
         )
-      }
+    }
 
-      const renderDisplayMode = () => {
+    const renderDisplayMode = () => {
         return  (<div className="payment-details">
-                    <Descriptions bordered={true} size="small">
-                        <Descriptions.Item label="Paid" span={4}>{ payment.paid ? "YES" : "NO"  }</Descriptions.Item>
-                        <Descriptions.Item label="Type" span={4}>{ PaymentMethod[payment.payment_type] }</Descriptions.Item>
-                        <Descriptions.Item label="Date" span={4}>{ payment.payment_date }</Descriptions.Item>
-                        <Descriptions.Item label="Paid By" span={4}>{payment.paid_by }</Descriptions.Item>
-                        <Descriptions.Item label="Charges" span={4}>
-                            <table>
-                               <tbody>
-                               { paymentCharges.map(( el,i)  => {
-                                   return (<tr key={i}><td>{el.name}</td><td>{el.amount}</td></tr>)
-                               } )}
-                               </tbody>
-                            </table>
-                        </Descriptions.Item>
-                    <Descriptions.Item label="Total" span={4}>${total}</Descriptions.Item>
-                    </Descriptions>
-                    <p>
-                        <Button onClick={setEditState}>Edit</Button>
-                    </p>
+            <Descriptions bordered={true} size="small">
+                <Descriptions.Item label="Paid" span={4}>{ payment.paid ? "YES" : "NO"  }</Descriptions.Item>
+                <Descriptions.Item label="Type" span={4}>{ PaymentMethod[payment.payment_type] }</Descriptions.Item>
+                <Descriptions.Item label="Date" span={4}>{ payment.payment_date }</Descriptions.Item>
+                <Descriptions.Item label="Paid By" span={4}>{payment.paid_by }</Descriptions.Item>
+                <Descriptions.Item label="Charges" span={4}>
+                    <table>
+                        <tbody>
+                        { paymentCharges.map(( el,i)  => {
+                            return (<tr key={i}><td>{el.name}</td><td>{el.amount}</td></tr>)
+                        } )}
+                        </tbody>
+                    </table>
+                </Descriptions.Item>
+                <Descriptions.Item label="Total" span={4}>${total}</Descriptions.Item>
+            </Descriptions>
+            <p>
+                <Button onClick={setEditState}>Edit</Button>
+            </p>
 
-                </div>)
-      }
+        </div>)
+    }
 
 
-      const renderView = () => {
+    const renderView = () => {
         return (
-            <div>{isEdit ? renderEditMode() : renderDisplayMode()}</div>
+            <div>{isEdit || isNew ? renderEditMode() : renderDisplayMode()}</div>
         )
-      }
-      const addPaymentDetails = () => {
+    }
+    const addPaymentDetails = () => {
         return (
-             <p>
-                  <Button onClick={setEditState}>Add Payment Details</Button>
-             </p>
+            <p>
+                <Button onClick={setEditState}>Add Payment Details</Button>
+            </p>
         )
-      }
+    }
 
     return (
         <div className="account">
-            { !isEmpty(payment) ? renderView() : addPaymentDetails() } <br />
+            { renderView() }
         </div>
     )
 }

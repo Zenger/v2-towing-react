@@ -22,7 +22,8 @@
     "typeRoots": [ "./types", "./node_modules/@types"]
   },
   "include": [
-    "src"
+    "src",
+    "custom.d.ts"
   ],
   "exclude": ["node_modules", "typings"]
 }

@@ -47,6 +47,10 @@ const Options = (props: any) => {
 
         api.fetchOptions( "price_group" ).then( response => {
             setData(  JSON.parse( response.data.value ) );
+        }).catch( (e) => {
+            message.error(e.message);
+            message.error("Couldn't load price groups, will default!");
+            resetDefaultPriceGroupOpt();
         }).finally( () => {
             setLoading(false);
         })
