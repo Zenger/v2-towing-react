@@ -22,7 +22,7 @@ const Account = (props: any) => {
         new: props.new,
         onCreated: props.onCreated,
         onChanged: props.onChanged,
-        hideSaveButton: props.hideSaveButton,
+        preventEditing: props.preventEditing,
     })
 
     const handleChange = (e: any) => {
@@ -75,7 +75,7 @@ const Account = (props: any) => {
                 <Descriptions.Item label="Phone" span={2}><a href={"tel:" + account.phone}>{account.phone}</a></Descriptions.Item>
                 <Descriptions.Item label="Address" span={2}><a href="tel:">{account.address}</a></Descriptions.Item>
                 <Descriptions.Item label="Notes" span={2}>{account.notes}</Descriptions.Item>
-                <Descriptions.Item label="Edit"><Button onClick={setEditState}>Edit</Button></Descriptions.Item>
+                { props.preventEditing ? "" : <Descriptions.Item label="Edit"><Button onClick={setEditState}>Edit</Button></Descriptions.Item> }
             </Descriptions>
         )
     }
@@ -113,7 +113,7 @@ const Account = (props: any) => {
                     <Col xs={6} push={4}>
                        <Space>
                            { props.new ? "" : <Button danger onClick={setEditState}>Cancel</Button> }
-                           { props.hideSaveButton ? "" : <Button type="primary" loading={isLoading} onClick={saveAccount}>Save</Button> }
+                           { props.preventEditing ? "" : <Button type="primary" loading={isLoading} onClick={saveAccount}>Save</Button> }
                        </Space>
                     </Col>
                 </Row>

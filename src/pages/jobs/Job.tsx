@@ -40,12 +40,15 @@ const Job = (props: any) => {
           updated_at: props.updated_at,
           new: props.new,
           onCreated: props.onCreated,
+          onChanged: props.onChanged,
+          preventEditing: props.preventEditing
     })
 
     const handleChange = (e: any) => {
-
-
         setJob(jobData => ({ ...jobData, [e.target.name]: e.target.value }));
+        if (props.onChanged) {
+            props.onChanged( job );
+        }
     }
 
 
@@ -56,7 +59,7 @@ const Job = (props: any) => {
         jobMeta[key] = value || "";
 
         setJob( jobData => ({...jobData, ["meta"] : jobMeta }));
-        console.log( job, jobMeta);
+
         return value;
 
     }
@@ -106,7 +109,7 @@ const Job = (props: any) => {
                     <Descriptions.Item label="Reference From">{ job.meta?.reference_from || "N/A" }</Descriptions.Item>
                     <Descriptions.Item label="Reference Number">{ job.meta?.reference_number || "N/A" }</Descriptions.Item>
                     <Descriptions.Item label="Notes">{ job.meta?.notes || "N/A" }</Descriptions.Item>
-                    <Descriptions.Item label="Edit"><Button onClick={setEditState}>Edit</Button></Descriptions.Item>
+                    { props.preventEditing ? "" : <Descriptions.Item label="Edit"><Button onClick={setEditState}>Edit</Button></Descriptions.Item> }
                 </Descriptions>
 
 
@@ -180,7 +183,7 @@ const Job = (props: any) => {
 
 
                 </Form>
-                  { props.new ? "" : <Button danger onClick={setEditState}>Cancel</Button> }<Button type="primary" onClick={saveJob}>Save</Button>
+                  { props.new ? "" : <Button danger onClick={setEditState}>Cancel</Button> } { props.preventEditing ? "" : <Button type="primary" onClick={saveJob}>Save</Button> }
             </div>
         )
     }

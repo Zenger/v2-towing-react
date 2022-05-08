@@ -33,6 +33,21 @@ const PaymentDetails = (props:any) => {
     }
 
 
+    useEffect( () => {
+        console.log(paymentCharges);
+        if (Object.keys(paymentCharges).length === 0) {
+            paymentCharges.push(
+                {
+                    name: "Base Rate",
+                    amount: 0
+
+                } as Charges
+            )
+            setTotal(0);
+        }
+    }, []);
+
+
     const loadPaymentInfo = () => {
         setLoading( true );
         let api = API.getInstance();
@@ -57,14 +72,9 @@ const PaymentDetails = (props:any) => {
         console.log(`Load Payment Info`);
     }
 
-
-
     useEffect(() => {
-
         if (id !== undefined) loadPaymentInfo()
-
         calculateTotal();
-
     }, [payment.id]);
 
     const handlePaymentChange = ( k: keyof PaymentStatus, value : any) => {

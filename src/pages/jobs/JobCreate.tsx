@@ -31,37 +31,76 @@ const JobCreate = (props: any) => {
         setUnit(unit);
     }
 
+    const jobChanged = (job: IJob) => {
+        setJob(job);
+    }
+
+    const paymentChanged = (payment:any) => {
+        setPayment(payment);
+    }
     const onChange = (step:any) => {
         setCurrentStep(step);
-
+        if (currentStep === 3) {
+            setNextVisible(false);
+        } else {
+            setNextVisible(true);
+        }
     }
 
     const nextStep = () => {
         setCurrentStep( currentStep + 1);
+        if (currentStep === 3) {
+            setNextVisible(false);
+        }
     }
 
 
     const renderAccountStep = () => {
-            return <Account new={true} account={account} onCreated={accountCreated} onChanged={accountChanged} hideSaveButton={true} />;
+            return <Account new={true} account={account} onCreated={accountCreated} onChanged={accountChanged} preventEditing={true} />;
     }
 
     const renderUnitStep = () => {
-        return <Unit new={true} unit={unit} onCreated={unitCreated} onChanged={unitChanged} hideSaveButton={true} />;
+        return <Unit new={true} unit={unit} onCreated={unitCreated} onChanged={unitChanged} preventEditing={true} />;
     }
     const renderJobStep = () => {
-        if (Object.keys(job).length !== 0) {
-            return <Job job={job} />
-        } else {
-            return <Job new={true} onCreated={jobCreated} />;
-        }
+            return <Job new={true} onCreated={jobCreated} onChanged={jobChanged} preventEditing={true} />;
     }
 
     const renderPaymentStep = () => {
-        if (Object.keys(payment).length !== 0) {
-            return <PaymentDetails payment={payment} />
-        } else {
-            return <PaymentDetails new={true} onCreated={paymentCreated} />
-        }
+        return <PaymentDetails new={true} onCreated={paymentCreated} onChanged={paymentChanged} preventEditing={true} />
+    }
+
+    const renderReviewStep = () => {
+        return <>
+            <br/>
+             <Row gutter={16}>
+                  <Col span={12}>
+                     <Card size="small" title="Account Details">
+                          <Account preventEditing={true} account={account} />
+                     </Card>
+                  </Col>
+                 <Col span={12}>
+                      <Card size="small" title="Unit Details">
+                          <Unit preventEditing={true}  unit={unit} />
+                      </Card>
+                 </Col>
+             </Row>
+                <br/>
+            <Row gutter={16}>
+                <Col span={18}>
+                    <Card size="small" title="Job Details">
+                        <Job preventEditing={true} job={job} />
+                    </Card>
+                </Col>
+                <Col span={6}>
+                   <Card size="small" title="Payment Details">
+                        <PaymentDetails payment={payment} />
+                   </Card>
+                </Col>
+            </Row>
+
+
+        </>
     }
 
     const accountCreated = (account:IAccount) => {
@@ -107,7 +146,8 @@ const JobCreate = (props: any) => {
                 { (currentStep === 0) ? renderAccountStep() : "" }
                 { (currentStep === 1) ? renderUnitStep() : "" }
                 { (currentStep === 2) ? renderJobStep() : "" }
-                { (currentStep === 3)? renderPaymentStep() : ""}
+                { (currentStep === 3) ? renderPaymentStep() : ""}
+                { (currentStep === 4) ? renderReviewStep() : "" }
 
                 { (nextVisible) ? <Button type="primary" onClick={nextStep} >Next</Button> : ""}
             </>
