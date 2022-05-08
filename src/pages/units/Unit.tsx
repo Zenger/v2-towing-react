@@ -33,7 +33,7 @@ const Unit = (props: any) => {
         new: props.new,
         onCreated: props.onCreated,
         onChanged: props.onChanged,
-        hideSaveButton: props.hideSaveButton
+        preventEditing: props.preventEditing
     })
 
     const handleChange = (e: any) => {
@@ -96,7 +96,7 @@ const Unit = (props: any) => {
                 <Descriptions.Item label="Color">{unit.color}</Descriptions.Item>
                 <Descriptions.Item label="Type">{UnitType[ unit.unit_type] }</Descriptions.Item>
                 <Descriptions.Item label="Notes" span={2}>{unit.meta}</Descriptions.Item>
-                <Descriptions.Item label="Edit"><Button onClick={setEditState}>Edit</Button></Descriptions.Item>
+                { props.preventEditing ? "" : <Descriptions.Item label="Edit"><Button onClick={setEditState}>Edit</Button></Descriptions.Item> }
             </Descriptions>
         )
     }
@@ -155,7 +155,7 @@ const Unit = (props: any) => {
                     <Col xs={6} push={4}>
                         <Space>
                             { props.new ? "" : <Button danger onClick={setEditState}>Cancel</Button> }
-                            { props.hideSaveButton ? "" : <Button type="primary" loading={isLoading} onClick={saveUnit}>Save</Button> }
+                            { props.preventEditing ? "" : <Button type="primary" loading={isLoading} onClick={saveUnit}>Save</Button> }
                         </Space>
                     </Col>
                 </Row>

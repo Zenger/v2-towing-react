@@ -89,7 +89,10 @@ export interface IJob {
   created_at: string;
   updated_at: string;
   new?: boolean;
-  onCreated?: boolean;
+  onCreated?: any;
+  onChanged?: any;
+  job?: any;
+  preventEditing?: boolean;
 }
 
 export interface IPageMeta {

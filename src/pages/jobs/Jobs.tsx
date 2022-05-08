@@ -131,9 +131,7 @@ const Jobs = (props: any) => {
                     <td className={background_class}><a href={job_url}>{job.id} { getJobIcon(job.tow_type) }</a></td>
                     <td><a href={from_map_url} target="_blank" rel="noreferrer">{job.from}</a></td>
                     <td><a href={dest_map_url} target="_blank" rel="noreferrer">{job.destination}</a></td>
-                    <td><a href={unit_url}>{job.unit_data.year} {job.unit_data.make} {job.unit_data.model} {job.unit_data.license}</a></td>
-                    <td><a href={account_url}>{job.account_data.name} {job.account_data.phone}</a></td>
-                    <td><a href={user_url}><Tag>{job.assignee_data.name}</Tag></a></td>
+
 
                 </tr>
         )
