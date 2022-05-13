@@ -16,7 +16,6 @@ const PaymentDetails = (props:any) => {
     const [isEdit, setEdit] = useState( false );
     const [isLoading, setLoading] = useState(false);
 
-    const [payment, setPayment] = useState({} as PaymentStatus);
 
     const [priceGroup, setPriceGroups] = useState([] as ChargeGroup[]);
     const [paymentCharges, setPaymentCharges] = useState([] as Charges[]);
@@ -24,7 +23,24 @@ const PaymentDetails = (props:any) => {
     const [total, setTotal ] = useState(0);
 
 
-    const {id } = props;
+    const {id, onChanged, onChargesChanged } = props;
+
+    const [payment, setPayment ] = useState({
+            id: props.id,
+            paid: props.paid,
+            payment_type: props.payment_type,
+            amount: props.amount,
+            paid_by: props.paid_by,
+            payment_date: props.payment_date,
+            payment: props.payment,
+            total: props.total,
+            onChanged: props.onChanged,
+            onChargesChanged: props.onChargesChanged,
+            new: props.new,
+            preventEditing: props.preventEditing
+    })
+
+
 
     const isNew = props.new;
 
@@ -34,8 +50,16 @@ const PaymentDetails = (props:any) => {
 
 
     useEffect( () => {
-        console.log(paymentCharges);
-        if (Object.keys(paymentCharges).length === 0) {
+        if (props.payment) {
+            setPayment(props.payment);
+            if (props.payment.charges) {
+                setPaymentCharges(props.payment.charges);
+
+                setTotal( props.payment.amount );
+            }
+
+        }
+        if (Object.keys(paymentCharges).length === 0 && !props.payment) {
             paymentCharges.push(
                 {
                     name: "Base Rate",
@@ -58,36 +82,24 @@ const PaymentDetails = (props:any) => {
                 r.charges = JSON.parse(r.charges);
 
                 setPaymentCharges( r.charges );
-                setPayment( r );
+                onChanged( {...payment, ['charges'] : r.charges });
 
-                console.log( r );
+                setPayment( r );
+                onChanged( r );
 
                 setLoading( false );
             }).catch( response => {
                 console.log(response);
             })
         }
-
-
-        console.log(`Load Payment Info`);
     }
-
-    useEffect(() => {
-        if (id !== undefined) loadPaymentInfo()
-        calculateTotal();
-    }, [payment.id]);
 
     const handlePaymentChange = ( k: keyof PaymentStatus, value : any) => {
-
         setPayment( paymentData => ({...paymentData, [k] : value }));
+        onChanged(  {...payment, [k] : value } );
     }
 
-    const setPaidBy = (v:string) => {
-        let p = payment;
-        p.paid_by = v;
-        setPayment(p);
 
-    }
 
     const handleChange = () => {}
     const savePaymentDetails = () => {
@@ -106,20 +118,26 @@ const PaymentDetails = (props:any) => {
 
 
     const loadPriceGroups = () => {
-        let api = API.getInstance();
-        setLoading(true);
 
-        api.fetchOptions("price_group").then(response => {
-            setPriceGroups( JSON.parse( response.data.value ) );
+        if (priceGroup.length > 0) {
+            calculateTotal();
+        } else {
+            let api = API.getInstance();
+            setLoading(true);
+
+            // prefetch
+            api.fetchCachedOption("price_group").then( (response:any) => {
+                setPriceGroups( response );
+                calculateTotal();
+            }).finally(
+                () => {
+                    setLoading(false);
+                }
+            )
 
 
-        }).finally(
-            () => {
-                setLoading(false);
-            }
-        )
+        }
 
-        console.log(`Load Price Groups`);
     }
 
     const setEditState = (e: any) => {
@@ -127,18 +145,18 @@ const PaymentDetails = (props:any) => {
         loadPriceGroups();
     }
 
-
     const setPriceGroup = (target:any) => {
         const selectedPaymentGroup = priceGroup[ target ];
         setPaymentCharges( selectedPaymentGroup.charges );
+        onChanged({...payment, ['charges'] : selectedPaymentGroup.charges.slice(0)} )
+        calculateTotal();
     }
-
-
 
     const removeCharge = (index:number) => {
         let charges = paymentCharges;
         let valueToRemove = [charges[index]];
         setPaymentCharges( charges.filter( e => !valueToRemove.includes(e)) );
+        onChanged( {...payment, ['charges'] : charges.filter( e => !valueToRemove.includes(e)) });
         calculateTotal();
     }
 
@@ -148,7 +166,9 @@ const PaymentDetails = (props:any) => {
         currentCharges.push( charge );
         paymentCharges.slice(0);
         setPaymentCharges( currentCharges.slice(0)); // @TODO: WTH? Why this slicing the array trigger a rerender?
+        onChanged( {...payment, ['charges'] : currentCharges.slice(0)});
         calculateTotal();
+
     }
 
 
@@ -156,6 +176,7 @@ const PaymentDetails = (props:any) => {
         let pc = paymentCharges;
         pc[i].amount = amount;
         setPaymentCharges( pc.slice(0) );
+        onChanged( {...payment, ['charges'] : pc.slice(0)});
         calculateTotal();
     }
 
@@ -170,7 +191,11 @@ const PaymentDetails = (props:any) => {
         setPayment( payment );
         setTotal( _total );
 
-        console.log(`Calc Total Payment Info`);
+
+
+
+        //onChanged( {...payment, ['charges'] : paymentCharges.slice(0)});
+
     }
 
 
@@ -179,13 +204,13 @@ const PaymentDetails = (props:any) => {
             <div>
                 <Form layout="horizontal" labelCol={{ span:8 }} wrapperCol={{ span: 10 }} initialValues={{ remember: true }}>
                     <Form.Item label="Paid">
-                        <Select defaultValue={payment.paid?.toString()}  onChange={value => handlePaymentChange("paid", value)}>
+                        <Select defaultValue={payment.paid?.toString()} value={payment.paid}  onChange={value => handlePaymentChange("paid", value)}>
                             <Option value="false">No</Option>
                             <Option value="true">Yes</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item label="Paid By">
-                        <Select defaultValue={payment.payment_type}>
+                        <Select defaultValue={payment.payment_type} value={payment.payment_type} onChange={value => handlePaymentChange("payment_type", value)}>
                             {
                                 PaymentMethod.map( (el, index) => {
                                     return <Option key={index} value={index}>{el}</Option>
@@ -206,7 +231,7 @@ const PaymentDetails = (props:any) => {
 
                     <Form.Item label="Pricing Group">
                         <Popconfirm title="This will reset current charges. Are you sure?">
-                            <Select onChange={setPriceGroup}>
+                            <Select  onClick={loadPriceGroups} onChange={setPriceGroup}>
                                 {
                                     priceGroup.map( (el, index) => {
                                         return <Option key={el.name + index} value={index}>{el.name}</Option>
@@ -226,7 +251,7 @@ const PaymentDetails = (props:any) => {
 
                 </Form>
                 <br />
-                <Button onClick={addCharge}><PlusOutlined /></Button> <Button danger onClick={setEditState}>Cancel</Button> <Button type="primary" onClick={savePaymentDetails}>Save</Button> <span style={{float: "right", fontSize:"16px"}}>Transaction Total: ${total} </span>
+                <Button onClick={addCharge}><PlusOutlined /></Button> { props.preventEditing ? "" : <Button danger onClick={setEditState}>Cancel</Button> } { props.preventEditing ? "" : <Button type="primary" onClick={savePaymentDetails}>Save</Button>} <span style={{float: "right", fontSize:"16px"}}>Transaction Total: ${total} </span>
             </div>
         )
     }
@@ -250,7 +275,7 @@ const PaymentDetails = (props:any) => {
                 <Descriptions.Item label="Total" span={4}>${total}</Descriptions.Item>
             </Descriptions>
             <p>
-                <Button onClick={setEditState}>Edit</Button>
+                {props.preventEditing ? "" : <Button onClick={setEditState}>Edit</Button> }
             </p>
 
         </div>)

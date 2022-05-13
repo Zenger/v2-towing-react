@@ -22,7 +22,6 @@ const JobCreate = (props: any) => {
     const [job, setJob] = useState({} as IJob);
     const [payment, setPayment] = useState({});
 
-
     const accountChanged = (account:IAccount) => {
         setAccount(account);
     }
@@ -36,8 +35,12 @@ const JobCreate = (props: any) => {
     }
 
     const paymentChanged = (payment:any) => {
+        console.log(`payment changed from child` ,payment);
         setPayment(payment);
     }
+
+
+
     const onChange = (step:any) => {
         setCurrentStep(step);
         if (currentStep === 3) {
@@ -63,11 +66,11 @@ const JobCreate = (props: any) => {
         return <Unit new={true} unit={unit} onCreated={unitCreated} onChanged={unitChanged} preventEditing={true} />;
     }
     const renderJobStep = () => {
-            return <Job new={true} onCreated={jobCreated} onChanged={jobChanged} preventEditing={true} />;
+            return <Job new={true} job={job} onCreated={jobCreated} onChanged={jobChanged} preventEditing={true} />;
     }
 
     const renderPaymentStep = () => {
-        return <PaymentDetails new={true} onCreated={paymentCreated} onChanged={paymentChanged} preventEditing={true} />
+        return <PaymentDetails new={true} onCreated={paymentCreated} onChanged={paymentChanged}  preventEditing={true} payment={payment} />
     }
 
     const renderReviewStep = () => {
@@ -94,7 +97,7 @@ const JobCreate = (props: any) => {
                 </Col>
                 <Col span={6}>
                    <Card size="small" title="Payment Details">
-                        <PaymentDetails payment={payment} />
+                        <PaymentDetails preventEditing={true} payment={payment} />
                    </Card>
                 </Col>
             </Row>

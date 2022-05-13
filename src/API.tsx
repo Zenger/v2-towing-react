@@ -1,5 +1,6 @@
 import axios from "axios";
 
+const DEBUG = true;
 
 export interface ApiResponseModel {
     data?: any,
@@ -271,6 +272,27 @@ export default class API {
         return axios.patch( process.env.REACT_APP_API_BASE + "/payments/" + id, payment, this.getHeaderConfigDefault() );
     }
 
+    fetchCachedOption(option_name:string) {
+        return new Promise( (done, reject)=> {
+            if (localStorage.getItem(option_name)) {
+                let ls =  localStorage.getItem(option_name) || "";
+                try {
+                    let r = JSON.parse( JSON.parse(ls) );
+                    return done( r );
+                } catch(e) {
+                    reject(e);
+                }
+            } else {
+                this.fetchOptions( option_name ).then( (data :any) => {
+                    localStorage.setItem( option_name, JSON.stringify(data.data.value) );
+                    return done( JSON.parse(data.data.value) );
+                }).catch( (e:any) => {
+                    return reject( e )
+                })
+            }
+        });
+    }
+
     fetchOptions( name: string) {
        return axios.get( process.env.REACT_APP_API_BASE + "/options/" + name, this.getHeaderConfigDefault()  )
     }
@@ -294,10 +316,10 @@ export default class API {
 
     createAttachment( job_id: number, filename: string = "picture.jpg", form_data: FormData ) {
             if (!process.env.REACT_APP_API_BASE)  process.env.REACT_APP_API_BASE = "http://localhost:3000/";
-
-
-
             return  axios.post(process.env.REACT_APP_API_BASE  + "/attachments/create/" + job_id + "?name=" + filename, form_data, { headers: { "Content-Type": "multipart/form-data" }} )
 
     }
 }
+
+
+
