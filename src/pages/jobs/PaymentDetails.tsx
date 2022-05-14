@@ -219,7 +219,7 @@ const PaymentDetails = (props:any) => {
                         </Select>
                     </Form.Item>
                     <Form.Item label="Payment Date">
-                        <DatePicker defaultValue={moment(payment.payment_date) || ""} onChange={ (o, date)=> handlePaymentChange("payment_date", date)} />
+                        <DatePicker value={moment(payment.payment_date) || ""} onChange={ (o, date)=> handlePaymentChange("payment_date", date)} />
                     </Form.Item>
 
 

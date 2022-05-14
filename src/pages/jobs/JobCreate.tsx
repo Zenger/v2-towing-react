@@ -1,11 +1,26 @@
-import {AutoComplete, Button, Card, Col, Dropdown, Menu, Modal, Row, Skeleton, Steps, Upload} from "antd";
+import {
+    AutoComplete,
+    Button,
+    Card,
+    Col,
+    Dropdown,
+    Menu,
+    message,
+    Modal,
+    Row,
+    Skeleton,
+    Spin,
+    Steps,
+    Upload
+} from "antd";
 import {useEffect, useRef, useState} from "react";
 import Account from "../accounts/Account";
 import Unit from "../units/Unit";
 import Job from "./Job";
 import PaymentDetails from "./PaymentDetails";
 import {UserAddOutlined, CarOutlined, DollarOutlined, EnvironmentOutlined, CheckOutlined} from "@ant-design/icons";
-import {IAccount, IJob, IUnit} from "../../API";
+import API, {IAccount, IJob, IUnit} from "../../API";
+import {useNavigate} from "react-router-dom";
 
 const {Step} = Steps;
 
@@ -21,25 +36,23 @@ const JobCreate = (props: any) => {
     const [unit, setUnit] = useState({} as IUnit);
     const [job, setJob] = useState({} as IJob);
     const [payment, setPayment] = useState({});
+    const [isLoading, setLoading] = useState(false);
+
+    let navigate = useNavigate();
+
 
     const accountChanged = (account:IAccount) => {
         setAccount(account);
     }
-
     const unitChanged = (unit: IUnit) => {
         setUnit(unit);
     }
-
     const jobChanged = (job: IJob) => {
         setJob(job);
     }
-
     const paymentChanged = (payment:any) => {
-        console.log(`payment changed from child` ,payment);
         setPayment(payment);
     }
-
-
 
     const onChange = (step:any) => {
         setCurrentStep(step);
@@ -55,6 +68,41 @@ const JobCreate = (props: any) => {
         if (currentStep === 3) {
             setNextVisible(false);
         }
+    }
+
+    const createJob = () => {
+
+        let api = API.getInstance();
+
+        setLoading(true);
+
+        Promise.all([
+            api.createAccount(account),
+            api.createUnit(unit),
+            api.createPayment(payment)
+
+        ]).then((res) => {
+            const accountRes = res[0];
+            const unitRes = res[1];
+            const paymentRes = res[2];
+            let j = job;
+            j.account = accountRes.data.id;
+            j.unit    = unitRes.data.id;
+            j.payment_id = paymentRes.data.id;
+
+            api.createJob( j ).then( (res) => {
+                let j = res.data;
+                message.success("Entities Created!");
+                navigate('/jobs/' + j.id);
+            }).catch((e) => {
+                message.error(e.message);
+            })
+
+        }).catch((e) => {
+            message.error(e.message);
+        }).finally(() => {
+            setLoading(false);
+        })
     }
 
 
@@ -74,7 +122,7 @@ const JobCreate = (props: any) => {
     }
 
     const renderReviewStep = () => {
-        return <>
+        return <Spin spinning={isLoading}>
             <br/>
              <Row gutter={16}>
                   <Col span={12}>
@@ -102,8 +150,10 @@ const JobCreate = (props: any) => {
                 </Col>
             </Row>
 
-
-        </>
+            <p>
+                <Button type="primary" onClick={createJob}>Create Job</Button> <Button danger onClick={() => {window.location.href="/"}}>Discard</Button>
+            </p>
+        </Spin>
     }
 
     const accountCreated = (account:IAccount) => {
@@ -144,7 +194,7 @@ const JobCreate = (props: any) => {
             <Step title="Job" icon={<EnvironmentOutlined />} />
             <Step title="Payment" icon={<DollarOutlined />} />
             <Step title="Review" icon={<CheckOutlined />} />
-        </Steps>
+        </Steps> <br/>
             <>
                 { (currentStep === 0) ? renderAccountStep() : "" }
                 { (currentStep === 1) ? renderUnitStep() : "" }

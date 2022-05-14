@@ -31,7 +31,7 @@ const Account = (props: any) => {
         }
         setAccount(accountData => ({ ...accountData, [e.target.name]: e.target.value }));
         if (props.onChanged) {
-            props.onChanged( account );
+            props.onChanged( {...account, [e.target.name]: e.target.value} );
         }
     }
 

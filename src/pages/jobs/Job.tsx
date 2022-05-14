@@ -41,16 +41,23 @@ const Job = (props: any) => {
           new: props.new,
           onCreated: props.onCreated,
           onChanged: props.onChanged,
-          preventEditing: props.preventEditing
+          preventEditing: props.preventEditing,
+          job: props.job
     })
 
     const handleChange = (e: any) => {
         setJob(jobData => ({ ...jobData, [e.target.name]: e.target.value }));
         if (props.onChanged) {
-            props.onChanged( job );
+            props.onChanged( { ...job, [e.target.name]: e.target.value} );
         }
     }
 
+
+    useEffect(() => {
+        if (props.job) {
+            setJob( props.job );
+        }
+    });
 
     type JM = keyof IJobMeta;
 
@@ -59,7 +66,9 @@ const Job = (props: any) => {
         jobMeta[key] = value || "";
 
         setJob( jobData => ({...jobData, ["meta"] : jobMeta }));
-
+        if (props.onChanged){
+            props.onChanged( {...job, ["meta"]: jobMeta });
+        }
         return value;
 
     }
@@ -143,7 +152,7 @@ const Job = (props: any) => {
                     </Form.Item>
 
                     <Form.Item label="Status">
-                        <Select defaultValue={ job.status || 0 } style={{ width: 300 }} onChange={event => {
+                        <Select value={ job.status || 0 } style={{ width: 300 }} onChange={event => {
                             handleChange({
                                 target : {
                                     name : "status",
@@ -156,7 +165,7 @@ const Job = (props: any) => {
                     </Form.Item>
 
                     <Form.Item label="Job Type">
-                        <Select defaultValue={ job.tow_type || 0 } style={{ width: 300 }} onChange={event => {
+                        <Select value={ job.tow_type || 0 } style={{ width: 300 }} onChange={event => {
                             handleChange({
                                 target : {
                                     name : "tow_type",
@@ -168,7 +177,7 @@ const Job = (props: any) => {
                         </Select>
                     </Form.Item>
                     <Form.Item label="Equipment">
-                        <Select defaultValue={ job.meta?.equipment_type || 0 } style={{ width: 300 }} onChange={value => handleMetaChange("equipment_type", value)}>
+                        <Select value={ job.meta?.equipment_type || 0 } style={{ width: 300 }} onChange={value => handleMetaChange("equipment_type", value)}>
                             { EquipmentType.map( (el, i)  => <Option value={i}>{el}</Option> ) }
                         </Select>
                     </Form.Item>
@@ -178,6 +187,9 @@ const Job = (props: any) => {
                     </Form.Item>
                      <Form.Item label="Reference Number">
                         <Input name="meta.reference_number" value={job.meta?.reference_number || ""} placeholder="Reference number if applicable" onChange={e=>handleMetaChange("reference_number", e.target.value)} />
+                    </Form.Item>
+                    <Form.Item label="Notes">
+                        <TextArea name="meta.notes" value={job.meta?.notes || ""} placeholder="Notes" onChange={e=>handleMetaChange("notes", e.target.value)} />
                     </Form.Item>
 
 

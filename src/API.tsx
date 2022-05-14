@@ -94,6 +94,7 @@ export interface IJob {
   onChanged?: any;
   job?: any;
   preventEditing?: boolean;
+
 }
 
 export interface IPageMeta {
@@ -244,7 +245,7 @@ export default class API {
     }
 
     createJob( job:IJob ){
-        return axios.post( process.env.REACT_APP_API_BASE + "/tows/" , this.getHeaderConfigDefault());
+        return axios.post( process.env.REACT_APP_API_BASE + "/tows/", job, this.getHeaderConfigDefault());
     }
 
     updateJob( job : IJob) {
@@ -270,6 +271,10 @@ export default class API {
 
     updatePaymentInfo(id: number | undefined, payment:any) {
         return axios.patch( process.env.REACT_APP_API_BASE + "/payments/" + id, payment, this.getHeaderConfigDefault() );
+    }
+
+    createPayment( payment: any ) {
+        return axios.post( process.env.REACT_APP_API_BASE + "/payments/", payment ,this.getHeaderConfigDefault());
     }
 
     fetchCachedOption(option_name:string) {

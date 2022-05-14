@@ -40,13 +40,13 @@ const Unit = (props: any) => {
         if (e.target.name === "license") {
             e.target.value = Mask( e.target.value, 'XX-XXXXXXXXX');
         } else if (e.target.name === "vin") {
-            e.target.value = Mask( e.target.value, '#################');
+            e.target.value = Mask( e.target.value, 'XXXXXXXXXXXXXXXXX');
         } else if (e.target.name === "year") {
             e.target.value = Mask( e.target.value , "####");
         }
         setUnit(unitData => ({ ...unitData, [e.target.name]: e.target.value }));
         if (props.onChanged) {
-            props.onChanged( unit );
+            props.onChanged( {...unit, [e.target.name]: e.target.value} );
         }
     }
 
