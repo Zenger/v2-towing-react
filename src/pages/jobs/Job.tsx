@@ -15,6 +15,40 @@ const { TextArea } = Input;
 const { Panel } = Collapse;
 
 
+const getAvailableDriverList = () => {
+    let names = sessionStorage.getItem('users');
+    if (names) {
+        console.log(JSON.parse(names));
+        return JSON.parse(names);
+    } else {
+        return [];
+    }
+}
+
+const parseDisplayNames = (j:any, id:string|number) => {
+    let names = JSON.parse(j);
+    for (let i =0; i < names.length; i++) {
+        if (names[i].id === id) {
+            return names[i].name;
+        }
+    }
+}
+
+const getDisplayNameFromSession = (id:string|number) => {
+    let names = sessionStorage.getItem('users');
+    if (!names) {
+        let api = API.getInstance();
+        api.fetchUsers().then( (res) => {
+            sessionStorage.setItem('users', JSON.stringify(res.data.data));
+            return parseDisplayNames(JSON.stringify(res.data.data), id);
+        })
+    }
+    else {
+        return parseDisplayNames(names, id);
+    }
+}
+
+
 
 const Job = (props: any) => {
 
@@ -118,6 +152,7 @@ const Job = (props: any) => {
                     <Descriptions.Item label="Reference From">{ job.meta?.reference_from || "N/A" }</Descriptions.Item>
                     <Descriptions.Item label="Reference Number">{ job.meta?.reference_number || "N/A" }</Descriptions.Item>
                     <Descriptions.Item label="Notes">{ job.meta?.notes || "N/A" }</Descriptions.Item>
+                    <Descriptions.Item label="Driver">{ getDisplayNameFromSession(job.assigned_to) || "N/A" }</Descriptions.Item>
                     { props.preventEditing ? "" : <Descriptions.Item label="Edit"><Button onClick={setEditState}>Edit</Button></Descriptions.Item> }
                 </Descriptions>
 
@@ -192,6 +227,21 @@ const Job = (props: any) => {
                         <TextArea name="meta.notes" value={job.meta?.notes || ""} placeholder="Notes" onChange={e=>handleMetaChange("notes", e.target.value)} />
                     </Form.Item>
 
+                    <Form.Item label="Drivers">
+                        <Select value={job.assigned_to || 0} style={{width: 300}} onChange={ e => handleChange({
+                                target : {
+                                    name : "assigned_to",
+                                    value: e
+                                },
+                            })}>
+                            {
+                                getAvailableDriverList().map( (e:any, i:number) => {
+
+                                   return <Option value={e.id}>{e.name}</Option>
+                                })
+                            }
+                        </Select>
+                    </Form.Item>
 
 
                 </Form>

@@ -18,10 +18,18 @@ import FleetUnits from "./pages/fleetunits/FleetUnits";
 import Options from "./pages/options/Options";
 import Users from "./pages/users/Users";
 import JobCreate from "./pages/jobs/JobCreate";
+import API from "./API";
 
 
 const { Content, Footer } = Layout;
 
+
+const initializeApp = () => {
+  let api = API.getInstance();
+  api.fetchUsers().then( (res) => {
+    sessionStorage.setItem('users', JSON.stringify(res.data.data));
+  });
+}
 
 
 ReactDOM.render(
@@ -95,6 +103,8 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
+
+initializeApp();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

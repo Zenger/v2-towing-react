@@ -94,6 +94,7 @@ export interface IJob {
   onChanged?: any;
   job?: any;
   preventEditing?: boolean;
+  display: string,
 
 }
 
@@ -306,6 +307,10 @@ export default class API {
         return axios.patch( process.env.REACT_APP_API_BASE + "/options/" + name, obj, this.getHeaderConfigDefault());
     }
 
+    createOptions( name: string, obj:any) {
+        return axios.post( process.env.REACT_APP_API_BASE + "/options/" + name, { name: name, value: obj}, this.getHeaderConfigDefault());
+    }
+
     fetchUsers() {
         return axios.get(  process.env.REACT_APP_API_BASE + "/users/", this.getHeaderConfigDefault() );
     }
@@ -323,6 +328,11 @@ export default class API {
             if (!process.env.REACT_APP_API_BASE)  process.env.REACT_APP_API_BASE = "http://localhost:3000/";
             return  axios.post(process.env.REACT_APP_API_BASE  + "/attachments/create/" + job_id + "?name=" + filename, form_data, { headers: { "Content-Type": "multipart/form-data" }} )
 
+    }
+
+
+    createJobResource (resource: any) {
+        return axios.post( process.env.REACT_APP_API_BASE + "/resource/job", resource, this.getHeaderConfigDefault());
     }
 }
 

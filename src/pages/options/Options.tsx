@@ -51,6 +51,8 @@ const Options = (props: any) => {
             message.error(e.message);
             message.error("Couldn't load price groups, will default!");
             resetDefaultPriceGroupOpt();
+
+            api.createOptions("price_group", defaults )
         }).finally( () => {
             setLoading(false);
         })

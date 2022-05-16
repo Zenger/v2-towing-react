@@ -76,7 +76,30 @@ const JobCreate = (props: any) => {
 
         setLoading(true);
 
-        Promise.all([
+
+        api.createJobResource({
+            account: account,
+            unit: unit,
+            tow: job,
+            payment: payment
+        }).then( (res) => {
+            if (res.data.error) {
+                message.error(res.data.error);
+            } else {
+                message.success("Job created!");
+                navigate("/jobs/" + res.data.job.id )
+            }
+        }).catch((e) => {
+            if (e.response.status) {
+                message.error("Minimal information for each step is REQUIRED!")
+            } else {
+                message.error(e.message);
+            }
+        }).finally(() => {
+            setLoading(false);
+        })
+
+       /* Promise.all([
             api.createAccount(account),
             api.createUnit(unit),
             api.createPayment(payment)
@@ -102,7 +125,7 @@ const JobCreate = (props: any) => {
             message.error(e.message);
         }).finally(() => {
             setLoading(false);
-        })
+        })*/
     }
 
 

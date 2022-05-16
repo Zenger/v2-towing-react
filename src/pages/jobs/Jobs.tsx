@@ -124,6 +124,18 @@ const Jobs = (props: any) => {
         const unit_url = "/unit/" + job.unit;
         const user_url = "/user/" + job.assigned_to;
         const account_url = "/account/" + job.account;
+        let account_string, unit_string, assigned_to_string;
+
+        if (!job.display) {
+             account_string = "N/A";
+             unit_string = "N/A";
+             assigned_to_string = "N/A";
+        } else {
+            let j = JSON.parse(job.display);
+             account_string = j.account || "N/A";
+             unit_string = j.unit || "N/A";
+             assigned_to_string = j.assigned_to || "N/A";
+        }
         const status_background = ["status-open", "status-open", "status-cancelled", "status-closed", "status-scheduled"];
         const background_class = (job.status !== null && job.status !== undefined) ? status_background[ job.status ] : "status-open";
         return (
@@ -131,6 +143,9 @@ const Jobs = (props: any) => {
                     <td className={background_class}><a href={job_url}>{job.id} { getJobIcon(job.tow_type) }</a></td>
                     <td><a href={from_map_url} target="_blank" rel="noreferrer">{job.from}</a></td>
                     <td><a href={dest_map_url} target="_blank" rel="noreferrer">{job.destination}</a></td>
+                    <td><a href={unit_url}>{unit_string}</a></td>
+                    <td><a href={account_url}>{account_string}</a></td>
+                    <td><a href={user_url}>{assigned_to_string}</a></td>
 
 
                 </tr>
