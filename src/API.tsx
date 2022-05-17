@@ -280,8 +280,8 @@ export default class API {
 
     fetchCachedOption(option_name:string) {
         return new Promise( (done, reject)=> {
-            if (localStorage.getItem(option_name)) {
-                let ls =  localStorage.getItem(option_name) || "";
+            if (sessionStorage.getItem(option_name)) {
+                let ls =  sessionStorage.getItem(option_name) || "";
                 try {
                     let r = JSON.parse( JSON.parse(ls) );
                     return done( r );
@@ -290,7 +290,7 @@ export default class API {
                 }
             } else {
                 this.fetchOptions( option_name ).then( (data :any) => {
-                    localStorage.setItem( option_name, JSON.stringify(data.data.value) );
+                    sessionStorage.setItem( option_name, JSON.stringify(data.data.value) );
                     return done( JSON.parse(data.data.value) );
                 }).catch( (e:any) => {
                     return reject( e )

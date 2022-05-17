@@ -84,7 +84,7 @@ const JobCreate = (props: any) => {
             payment: payment
         }).then( (res) => {
             if (res.data.error) {
-                message.error(res.data.error);
+                message.error(res.data.message);
             } else {
                 message.success("Job created!");
                 navigate("/jobs/" + res.data.job.id )
