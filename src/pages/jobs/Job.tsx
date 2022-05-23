@@ -18,7 +18,7 @@ const { Panel } = Collapse;
 const getAvailableDriverList = () => {
     let names = sessionStorage.getItem('users');
     if (names) {
-        console.log(JSON.parse(names));
+
         return JSON.parse(names);
     } else {
         return [];
@@ -41,6 +41,8 @@ const getDisplayNameFromSession = (id:string|number) => {
         api.fetchUsers().then( (res) => {
             sessionStorage.setItem('users', JSON.stringify(res.data.data));
             return parseDisplayNames(JSON.stringify(res.data.data), id);
+        }).catch( (e) => {
+            message.error(e);
         })
     }
     else {
@@ -123,7 +125,7 @@ const Job = (props: any) => {
 
             })
         } else {
-            api.createJob(job as IJob).then((response) => {
+            api.updateJob(job as IJob).then((response) => {
                 message.success("Job Saved!");
             }).catch(e => {
                 message.error(e.message, 1.5);

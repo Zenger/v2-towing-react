@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Route, Link , Routes} from "react-router-dom";
 
 import 'antd/dist/antd.css'
 
-import { Layout, Menu } from 'antd';
+import {Layout, Menu, message} from 'antd';
 import {HomeOutlined, UserOutlined, CarOutlined, EnvironmentOutlined, SettingOutlined} from '@ant-design/icons';
 
 import Accounts from './pages/accounts/Accounts';
@@ -28,7 +28,9 @@ const initializeApp = () => {
   let api = API.getInstance();
   api.fetchUsers().then( (res) => {
     sessionStorage.setItem('users', JSON.stringify(res.data.data));
-  });
+  }).catch( (e) => {
+    message.error(e.message);
+  })
 }
 
 

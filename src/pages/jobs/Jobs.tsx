@@ -125,17 +125,14 @@ const Jobs = (props: any) => {
         const user_url = "/user/" + job.assigned_to;
         const account_url = "/account/" + job.account;
         let account_string, unit_string, assigned_to_string;
+        let display = JSON.parse(job.display) || {};
 
-        if (!job.display) {
-             account_string = "N/A";
-             unit_string = "N/A";
-             assigned_to_string = "N/A";
-        } else {
-            let j = JSON.parse(job.display);
-             account_string = j.account || "N/A";
-             unit_string = j.unit || "N/A";
-             assigned_to_string = j.assigned_to || "N/A";
-        }
+
+        account_string = (display.account) ? display.account : "N/A";
+        unit_string = (display.unit) ? display.unit : "N/A";
+        assigned_to_string = (display.user) ? display.user : "N/A";
+
+
         const status_background = ["status-open", "status-open", "status-cancelled", "status-closed", "status-scheduled"];
         const background_class = (job.status !== null && job.status !== undefined) ? status_background[ job.status ] : "status-open";
         return (

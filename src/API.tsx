@@ -94,8 +94,6 @@ export interface IJob {
   onChanged?: any;
   job?: any;
   preventEditing?: boolean;
-  display: string,
-
 }
 
 export interface IPageMeta {

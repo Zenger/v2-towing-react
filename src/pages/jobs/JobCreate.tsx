@@ -90,7 +90,7 @@ const JobCreate = (props: any) => {
                 navigate("/jobs/" + res.data.job.id )
             }
         }).catch((e) => {
-            if (e.response.status) {
+            if (e.response.status === 500) {
                 message.error("Minimal information for each step is REQUIRED!")
             } else {
                 message.error(e.message);
