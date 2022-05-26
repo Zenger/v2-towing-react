@@ -133,7 +133,7 @@ const Jobs = (props: any) => {
         assigned_to_string = (display.user) ? display.user : "N/A";
 
 
-        const status_background = ["status-open", "status-open", "status-cancelled", "status-closed", "status-scheduled"];
+        const status_background = ["status-open", "status-open", "status-cancelled", "status-closed", "status-scheduled", "status-public"];
         const background_class = (job.status !== null && job.status !== undefined) ? status_background[ job.status ] : "status-open";
         return (
                 <tr key={job.id}>

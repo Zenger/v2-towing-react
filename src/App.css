@@ -34,6 +34,10 @@
 .status-open {
     background-color: #dff0d8 !important;;
 }
+
+.status-public {
+    background-color: #DFF6F4 !important;;
+}
 /* Bootstrap 3 Pagination CSS */
 .pagination {
   display: inline-block;

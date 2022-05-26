@@ -259,6 +259,10 @@ const JobView = (props: any) => {
 
     }
 
+    const paymentChanged = () => {
+
+    }
+
 
 
     if (isLoading) {
@@ -315,7 +319,7 @@ const JobView = (props: any) => {
                             </Col>
                             <Col span={6}>
                                 <Card size="small" title="Payment Info">
-                                    <PaymentDetails id={job.payment_id} />
+                                    <PaymentDetails id={job.payment_id} onChanged={paymentChanged} />
 
                                 </Card>
                             </Col>

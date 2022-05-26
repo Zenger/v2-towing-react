@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Button, DatePicker, Descriptions, Divider, Form, Input, Popconfirm, Select} from "antd";
+import {Button, DatePicker, Descriptions, Divider, Form, Input, message, Popconfirm, Select} from "antd";
 
 import API, {ChargeGroup, Charges, PaymentStatus} from "../../API";
 import {PaymentMethod} from "../../Types";
@@ -88,8 +88,8 @@ const PaymentDetails = (props:any) => {
                 onChanged( r );
 
                 setLoading( false );
-            }).catch( response => {
-                console.log(response);
+            }).catch( e => {
+                message.error(e.message)
             })
         }
     }
@@ -119,25 +119,16 @@ const PaymentDetails = (props:any) => {
 
     const loadPriceGroups = () => {
 
-        if (priceGroup.length > 0) {
-            calculateTotal();
-        } else {
             let api = API.getInstance();
             setLoading(true);
-
             // prefetch
             api.fetchCachedOption("price_group").then( (response:any) => {
                 setPriceGroups( response );
-                calculateTotal();
             }).finally(
                 () => {
                     setLoading(false);
                 }
             )
-
-
-        }
-
     }
 
     const setEditState = (e: any) => {
@@ -146,17 +137,21 @@ const PaymentDetails = (props:any) => {
     }
 
     const setPriceGroup = (target:any) => {
+
         const selectedPaymentGroup = priceGroup[ target ];
         setPaymentCharges( selectedPaymentGroup.charges );
         onChanged({...payment, ['charges'] : selectedPaymentGroup.charges.slice(0)} )
-        calculateTotal();
+
+        calculateTotal(selectedPaymentGroup.charges);
     }
 
     const removeCharge = (index:number) => {
         let charges = paymentCharges;
         let valueToRemove = [charges[index]];
+        if (charges.length === 1) return;
         setPaymentCharges( charges.filter( e => !valueToRemove.includes(e)) );
         onChanged( {...payment, ['charges'] : charges.filter( e => !valueToRemove.includes(e)) });
+
         calculateTotal();
     }
 
@@ -167,6 +162,7 @@ const PaymentDetails = (props:any) => {
         paymentCharges.slice(0);
         setPaymentCharges( currentCharges.slice(0)); // @TODO: WTH? Why this slicing the array trigger a rerender?
         onChanged( {...payment, ['charges'] : currentCharges.slice(0)});
+
         calculateTotal();
 
     }
@@ -177,13 +173,21 @@ const PaymentDetails = (props:any) => {
         pc[i].amount = amount;
         setPaymentCharges( pc.slice(0) );
         onChanged( {...payment, ['charges'] : pc.slice(0)});
+
         calculateTotal();
     }
 
-    const calculateTotal = () => {
+    const calculateTotal = (pc: Charges[] = []) => {
         let _total: number = 0;
-        for (let i = 0; i< paymentCharges.length; i++) {
-            _total = +_total + +paymentCharges[i].amount;
+
+        let _pc = paymentCharges.slice(0);
+
+        if (pc.length > 0) {
+            _pc = pc;
+        }
+
+        for (let i = 0; i< _pc.length; i++) {
+                _total = +_total + +_pc[i].amount;
         }
 
         let p = payment;
@@ -191,11 +195,7 @@ const PaymentDetails = (props:any) => {
         setPayment( payment );
         setTotal( _total );
 
-
-
-
         //onChanged( {...payment, ['charges'] : paymentCharges.slice(0)});
-
     }
 
 

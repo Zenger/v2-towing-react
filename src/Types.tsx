@@ -71,7 +71,8 @@ export let StatusType = [
     'In Progress',
     'Cancelled',
     'Closed',
-    'Scheduled'
+    'Scheduled',
+    'Public'
 ];
 
 
